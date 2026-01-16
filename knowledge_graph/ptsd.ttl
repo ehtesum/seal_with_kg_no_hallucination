@@ -1,0 +1,15 @@
+@prefix ns1: <http://example.org/mental#> .
+
+ns1:ptsd ns1:hasSymptom ns1:angry_outbursts,
+        ns1:at_least_one_avoidance_symptom,
+        ns1:avoiding_things_related_to_the_traumatic_event,
+        ns1:difficulty_concentrating,
+        ns1:flashbacks,
+        ns1:having_angry_outbursts,
+        ns1:havingdifficulty_sleeping,
+        ns1:irritability,
+        ns1:nightmares,
+        ns1:repetitive_and_distressing_images_or_sensations,
+        ns1:sleeping_problems_insomnia,
+        ns1:trouble_concentrating .
+

@@ -1,0 +1,18 @@
+@prefix ns1: <http://example.org/mental#> .
+
+ns1:anxiety a "Concept" ;
+    ns1:description "Anxiety: excessive worry, restlessness, sleep problems. Evidence: WHO summary..." ;
+    ns1:label "Anxiety" .
+
+ns1:depression a "Concept" ;
+    ns1:description "Depression: low mood, anhedonia, changes in sleep. Evidence: WHO summary..." ;
+    ns1:label "Depression" .
+
+ns1:ocd a "Concept" ;
+    ns1:description "OCD: intrusive thoughts and repetitive actions. Evidence: NICE guidelines..." ;
+    ns1:label "Obsessive-compulsive disorder" .
+
+ns1:schizophrenia a "Concept" ;
+    ns1:description "Schizophrenia: psychosis, hallucinations, treated with antipsychotics and psychosocial support." ;
+    ns1:label "Schizophrenia" .
+

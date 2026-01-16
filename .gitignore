@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.vscode/
+training_output/
+models/
+models/*.pt
+models/*.ckpt
+models/*.bin
+models/*.h5
+data/
+*.log
+*.tmp
+.DS_Store
