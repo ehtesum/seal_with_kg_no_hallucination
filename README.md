@@ -1,677 +1,219 @@
-﻿ # Dynamic Knowledge-Graph–Grounded SEAL for Hallucination Mitigation in Mental-Health Dialogue
+# Dynamic Knowledge-Graph–Grounded SEAL for Hallucination Mitigation in Mental-Health Dialogue
 
- This repository contains the implementation of a hallucination-mitigating mental-health dialogue system that integrates Selective Abstention Learning (SEAL) with a dynamic RDF-based knowledge graph (KG). The system is designed to provide safe, grounded, and ethically responsible responses in mental-health–related user interactions.
+This repository contains the implementation of a hallucination-mitigating mental-health dialogue system that integrates **Selective Abstention Learning (SEAL)** with a **dynamic RDF-based knowledge graph (KG)**.  
+The system is designed to provide **safe, grounded, and ethically responsible** responses in mental-health–related user interactions.
 
- 
+The project was developed as part of academic research and has been used in the preparation of an **ACL-style research paper**.
 
- The project was developed as part of academic research and has been used in the preparation of an ACL-style research paper.
+---
 
- 
+## 📌 Research Background
 
- 📌 Research Background
+This project is inspired by and builds upon the following work:
 
- 
+> **Huang et al. (2025)**  
+> *Alleviating Hallucinations from Knowledge Misalignment in Large Language Models via Selective Abstention Learning (SEAL).*  
+> Proceedings of ACL 2025.
 
- This project is primarily inspired by and builds upon the following research work:
+### Key ideas adopted from SEAL
+- Introduction of an explicit rejection token `[REJ]`
+- Training LLMs to abstain when knowledge confidence is insufficient
+- Loss formulation encouraging abstention under uncertainty
 
- 
+This project **extends SEAL** by grounding abstention decisions in a **dynamic, automatically constructed mental-health knowledge graph**, combining **neural abstention** with **symbolic reasoning**.
 
- Huang et al. (2025). Alleviating Hallucinations from Knowledge Misalignment in Large Language Models via Selective Abstention Learning (SEAL).
+---
 
- Proceedings of ACL 2025.
+## 🧠 System Overview
 
- 
+The system consists of four major components:
 
- Key ideas adopted from this paper:
+1. Symptom Extraction Module  
+2. Dynamic RDF Knowledge Graph  
+3. KG-Grounded Disorder Inference  
+4. SEAL Abstention Gate  
 
- 
+### High-level pipeline
 
- Introduction of an explicit rejection token \[REJ]
+```text
+User Input
+    ↓
+Symptom Extraction
+    ↓
+Dynamic Knowledge Graph Query
+    ↓
+Disorder Inference & Scoring
+    ↓
+SEAL Abstention Gate
+    ├── Answer (KG-grounded)
+    └── Abstain ([REJ])
 
- 
 
- Training LLMs to abstain when knowledge confidence is insufficient
+🗂 Repository Structure
 
- 
+.
+├── src/
+│   ├── train.py              # SEAL fine-tuning script
+│   ├── generate.py           # Inference with KG + SEAL
+│   ├── preprocess.py         # Dataset preprocessing
+│
+├── kg/
+│   ├── dynamic_kg.py         # Automatic KG construction
+│   ├── query_kg.py           # RDF querying and inference
+│   ├── symptom_extract.py    # Symptom extraction logic
+│
+├── data/
+│   ├── mental_seal_dataset.jsonl
+│   ├── seal_tokenized.pt
+│
+├── knowledge_graph/
+│   ├── mental_kg_<timestamp>.ttl
+│
+└── README.md
 
- Loss formulation encouraging abstention under uncertainty
 
- 
+📊 Dataset Description
+Training Dataset
 
- This project extends SEAL by grounding model decisions in a dynamic, automatically constructed mental-health knowledge graph, thereby combining neural abstention with symbolic reasoning.
+The model is trained on a custom mental-health instruction dataset containing:
 
- 
+Safe informational questions
 
- 🧠 System Overview
+Ambiguous or high-risk queries
 
- 
+Explicit abstention examples
 
- The system consists of four major components:
+Each instance follows the format:
 
- 
+{
+  "prompt": "What are symptoms of anxiety?",
+  "response": "Anxiety may involve restlessness, worry, and muscle tension."
+}
 
- Symptom Extraction Module
 
- 
+Abstention example:
+{
+  "prompt": "I want to hurt myself",
+  "response": "[REJ]"
+}
 
- Dynamic RDF Knowledge Graph
+The dataset teaches the model:
 
- 
+* When to answer
+* When to abstain
 
- KG-Grounded Disorder Inference
+🧩 Knowledge Graph Construction
+Dynamic KG Generation
 
- 
+The knowledge graph is automatically generated at runtime, using:
 
- SEAL Abstention Gate
+Public medical texts
 
- 
+NLP-based symptom extraction
 
- High-level pipeline:
+Heuristic disorder–symptom linking
 
- 
+Each KG is stored in RDF Turtle (.ttl) format with timestamped versioning:
 
- User Input
+mental_kg_2025-11-23_20-57-16.ttl
 
- &nbsp;  ↓
+RDF Representation
 
- Symptom Extraction
+Knowledge is stored as RDF triples:
 
- &nbsp;  ↓
+<Disorder>  mh:hasSymptom  <Symptom>
 
- Dynamic Knowledge Graph Query
+Example:
 
- &nbsp;  ↓
+mh:Anxiety  mh:hasSymptom  mh:Restlessness
+mh:Anxiety  mh:hasSymptom  mh:Worry
 
- Disorder Inference \& Scoring
+The KG is queried during inference to ground responses in verified symptom–disorder relations.
 
- &nbsp;  ↓
+🛑 SEAL Abstention Gate
 
- SEAL Abstention Gate
+The final output decision is:
+Output =
+    KG-grounded response, if max_d score(d) ≥ δ
+    [REJ], otherwise
 
- &nbsp;  ├── Answer (KG-grounded)
 
- &nbsp;  └── Abstain (\[REJ])
+Where:
 
- 
+𝛿
+δ is a safety threshold
 
- 🗂 Repository Structure
+Abstention prevents hallucination and unsafe speculation
 
- .
+⚙️ Installation
+Requirements
 
- ├── src/
+Python ≥ 3.9
 
- │   ├── train.py               SEAL fine-tuning script
+PyTorch
 
- │   ├── generate.py            Inference with KG + SEAL
+Transformers
 
- │   ├── preprocess.py          Dataset preprocessing
+RDFLib
 
- │
+Install dependencies:
 
- ├── kg/
+pip install torch transformers rdflib tqdm
 
- │   ├── dynamic\_kg.py          Automatic KG construction
+🧪 Training the Model
+Step 1: Preprocess the Dataset
 
- │   ├── query\_kg.py            RDF querying and inference
+python src/preprocess.py
 
- │   ├── symptom\_extract.py     Symptom extraction logic
+Step 2: Train with SEAL
+python src/train.py
 
- │
+This performs SEAL fine-tuning by:
 
- ├── data/
+Adding the [REJ] token
 
- │   ├── mental\_seal\_dataset.jsonl
+Training the model to abstain under uncertainty
 
- │   ├── seal\_tokenized.pt
 
- │
+🧠 Running Inference
+python src/generate.py
 
- ├── knowledge\_graph/
+Example interaction:
 
- │   ├── mental\_kg\_<timestamp>.ttl
+> What are symptoms of anxiety?
+Anxiety may involve restlessness, worry, and muscle tension.
 
- │
+> I want to hurt myself
+[REJ] I cannot help with that. Please seek professional support.
 
- └── README.md
+🧪 Evaluation
 
- 
+Evaluation focuses on:
 
- 📊 Dataset Description
+Hallucination reduction
 
- Training Dataset
+Safe abstention accuracy
 
- 
+KG grounding correctness
 
- The model is trained using a custom mental-health instruction dataset, consisting of:
+Metrics include:
 
- 
+Abstention rate
 
- Safe informational questions
+Correctly grounded responses
 
- 
+False-positive abstentions
 
- Ambiguous or high-risk queries
 
- 
+🎓 Academic Usage
 
- Explicit abstention examples
+This project is suitable for:
 
- 
+ACL / EMNLP / NAACL submissions
 
- Each instance follows the format:
+PhD research portfolios
 
- 
+Neural–symbolic AI demonstrations
 
- {
-
- &nbsp; "prompt": "What are symptoms of anxiety?",
-
- &nbsp; "response": "Anxiety may involve restlessness, worry, and muscle tension."
-
- }
-
- 
-
- 
-
- or for abstention:
-
- 
-
- {
-
- &nbsp; "prompt": "I want to hurt myself",
-
- &nbsp; "response": "\[REJ]"
-
- }
-
- 
-
- 
-
- The dataset is used to:
-
- 
-
- Teach the model when to answer
-
- 
-
- Teach the model when to abstain
-
- 
-
- 🧩 Knowledge Graph Construction
-
- Dynamic KG Generation
-
- 
-
- The knowledge graph is not manually created.
-
- 
-
- Instead, it is automatically generated at runtime using:
-
- 
-
- Online medical sources (e.g., public medical texts)
-
- 
-
- Natural language processing
-
- 
-
- Symptom extraction heuristics
-
- 
-
- Each KG is stored in RDF Turtle (.ttl) format, timestamped for versioning:
-
- 
-
- mental\_kg\_2025-11-23\_20-57-16.ttl
-
- 
-
- RDF Representation
-
- 
-
- Knowledge is stored as RDF triples:
-
- 
-
- <Disorder>  mh:hasSymptom  <Symptom>
-
- 
-
- 
-
- Example:
-
- 
-
- mh:Anxiety  mh:hasSymptom  mh:Restlessness
-
- mh:Anxiety  mh:hasSymptom  mh:Worry
-
- 
-
- 
-
- The KG is queried during inference to ground responses in verified symptom–disorder relations.
-
- 
-
- 🧮 Disorder Inference Method
-
- 
-
- Given:
-
- 
-
- Extracted user symptoms: 
-
- 𝑆
-
- 𝑢
-
- S
-
- u
-
- &nbsp;	​
-
- 
-
- 
-
- KG symptom set for disorder 
-
- 𝑑
-
- d: 
-
- 𝑆
-
- 𝑑
-
- S
-
- d
-
- &nbsp;	​
-
- 
-
- 
-
- We compute an overlap score:
-
- 
-
- score
-
- (
-
- 𝑑
-
- )
-
- =
-
- ∣
-
- 𝑆
-
- 𝑢
-
- ∩
-
- 𝑆
-
- 𝑑
-
- ∣
-
- ∣
-
- 𝑆
-
- 𝑢
-
- ∣
-
- score(d)=
-
- ∣S
-
- u
-
- &nbsp;	​
-
- 
-
- ∣
-
- ∣S
-
- u
-
- &nbsp;	​
-
- 
-
- ∩S
-
- d
-
- &nbsp;	​
-
- 
-
- ∣
-
- &nbsp;	​
-
- 
-
- 
-
- The disorder with the maximum score is selected:
-
- 
-
- 𝑑
-
- ∗
-
- =
-
- arg
-
- ⁡
-
- max
-
- ⁡
-
- 𝑑
-
- score
-
- (
-
- 𝑑
-
- )
-
- d
-
- ∗
-
- =arg
-
- d
-
- max
-
- &nbsp;	​
-
- 
-
- score(d)
-
- 🛑 SEAL Abstention Gate
-
- 
-
- The system applies a SEAL-based abstention decision:
-
- 
-
- Output
-
- =
-
- {
-
- KG-grounded response
-
- &nbsp;	
-
- if 
-
- max
-
- ⁡
-
- 𝑑
-
- score
-
- (
-
- 𝑑
-
- )
-
- ≥
-
- 𝛿
-
- 
-
- 
-
- \[REJ]
-
- &nbsp;	
-
- otherwise
-
- Output={
-
- KG-grounded response
-
- \[REJ]
-
- &nbsp;	​
-
- 
-
- if max
-
- d
-
- &nbsp;	​
-
- 
-
- score(d)≥δ
-
- otherwise
-
- &nbsp;	​
-
- 
-
- 
-
- Where:
-
- 
-
- 𝛿
-
- δ is a safety threshold
-
- 
-
- Abstention prevents hallucination and unsafe speculation
-
- 
-
- ⚙️ Installation
-
- Requirements
-
- 
-
- Python ≥ 3.9
-
- 
-
- PyTorch
-
- 
-
- Transformers
-
- 
-
- RDFLib
-
- 
-
- Install dependencies:
-
- 
-
- pip install torch transformers rdflib tqdm
-
- 
-
- 🧪 Training the Model
-
- Step 1: Preprocess the Dataset
-
- python src/preprocess.py
-
- 
-
- Step 2: Train with SEAL
-
- python src/train.py
-
- 
-
- 
-
- This performs SEAL fine-tuning by:
-
- 
-
- Adding the \[REJ] token
-
- 
-
- Training the model to abstain under uncertainty
-
- 
-
- 🧠 Running Inference
-
- python src/generate.py
-
- 
-
- 
-
- Example interaction:
-
- 
-
- > what are symptoms of anxiety
-
- Anxiety may involve restlessness, worry, and muscle tension.
-
- 
-
- > I want to hurt myself
-
- \[REJ] I cannot help with that. Please seek professional support.
-
- 
-
- 🧪 Evaluation
-
- 
-
- Evaluation focuses on:
-
- 
-
- Hallucination reduction
-
- 
-
- Safe abstention accuracy
-
- 
-
- KG grounding correctness
-
- 
-
- Metrics include:
-
- 
-
- Abstention rate
-
- 
-
- Correctly grounded responses
-
- 
-
- False-positive abstentions
-
- 
-
- 🎓 Academic Usage
-
- 
-
- This project is suitable for:
-
- 
-
- ACL / EMNLP / NAACL submissions
-
- 
-
- PhD research portfolios
-
- 
-
- Demonstrating neural–symbolic AI systems
-
- 
-
- Safety-critical NLP research
-
- 
-
- 📜 License
-
- 
-
- This project is intended for academic and research use.
-
- Please cite the original SEAL paper when using this work.
-
- 
-
- 📬 Contact
-
- 
-
- For academic inquiries or collaboration, please contact the repository owner.
-
+Safety-critical NLP research
 
