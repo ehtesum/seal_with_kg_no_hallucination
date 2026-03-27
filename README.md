@@ -4,8 +4,6 @@ This repository contains the implementation of a hallucination-mitigating mental
 
 The system is designed to provide **safe, grounded, and ethically responsible** responses in mental-health–related user interactions.
 
-The project was developed as part of academic research and has been used in the preparation of an **ACL-style research paper**.
-
 ---
 
 # Research Background
@@ -14,7 +12,7 @@ This project is inspired by and builds upon the following work:
 
 > **Huang et al. (2025)**
 > *Alleviating Hallucinations from Knowledge Misalignment in Large Language Models via Selective Abstention Learning (SEAL).*
-> Proceedings of ACL 2025.
+
 
 ### Key ideas adopted from SEAL
 
