@@ -236,11 +236,3 @@ Metrics include:
 
 ---
 
-#  Academic Usage
-
-This project is suitable for:
-
-* ACL / EMNLP / NAACL submissions
-* PhD research portfolios
-* Neural–symbolic AI demonstrations
-* Safety-critical NLP research
