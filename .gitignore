@@ -1,14 +1,25 @@
+# Environments & caches
 .venv/
+env/
 __pycache__/
 *.pyc
+.ipynb_checkpoints/
 .vscode/
-training_output/
-models/
-models/*.pt
-models/*.ckpt
-models/*.bin
-models/*.h5
-data/
+.idea/
+.DS_Store
+
+# Logs & temp
 *.log
 *.tmp
-.DS_Store
+*.db
+mlflow.db
+mlruns/
+
+# Large model weights & checkpoints
+models/
+training_output/
+*.pt
+*.ckpt
+*.bin
+*.h5
+*.safetensors

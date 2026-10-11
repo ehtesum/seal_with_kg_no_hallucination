@@ -53,25 +53,34 @@ SEAL Abstention Gate
 
 # Repository Structure
 
-```
+```text
 .
-├── src/
-│   ├── train.py              # SEAL fine-tuning script
-│   ├── generate.py           # Inference with KG + SEAL
-│   ├── preprocess.py         # Dataset preprocessing
-│
-├── kg/
-│   ├── dynamic_kg.py         # Automatic KG construction
-│   ├── query_kg.py           # RDF querying and inference
-│   ├── symptom_extract.py    # Symptom extraction logic
-│
-├── data/
+├── benchmarks/               # Benchmark scores and evaluation predictions
+│   ├── benchmark_results.csv
+│   └── eval_predictions.jsonl
+├── configs/                  # Hyperparameters and LoRA training configuration
+│   └── train_config.yaml
+├── data/                     # Instruction datasets, KG nodes & data generation scripts
+│   ├── expand_safe_dataset.py
+│   ├── generate_mental_dataset.py
+│   ├── make_mental_dataset.py
+│   ├── kg_nodes.jsonl
 │   ├── mental_seal_dataset.jsonl
-│   ├── seal_tokenized.pt
-│
-├── knowledge_graph/
-│   ├── mental_kg_<timestamp>.ttl
-│
+│   └── seal_dataset.jsonl
+├── experiments/              # Standalone experimental pipelines
+│   └── hybrid_pipeline/     # Neuro-symbolic pipeline & Colab-ready test suite
+├── kg/                       # Dynamic RDF Knowledge Graph construction & queries
+│   ├── dynamic_kg.py
+│   ├── disorder_detector.py
+│   ├── symptom_extractor.py
+│   └── visualize_kg.py
+├── knowledge_graph/          # Serialized TTL graph snapshots
+├── src/                      # Core training, inference, and benchmarking
+│   ├── train_seal.py
+│   ├── infer_seal.py
+│   ├── run_benchmark.py
+│   ├── compute_metrics.py
+│   └── qwen/                 # Qwen-specific fine-tuning and abstention modules
 └── README.md
 ```
 
